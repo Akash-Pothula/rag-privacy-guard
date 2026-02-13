@@ -1,0 +1,28 @@
+[project]
+name = "rag-privacy-guard"
+version = "1.0.0"
+description = "Blue Team Agent for evaluating RAG system responses against Philips Privacy Principles"
+authors = [
+    {name = "Akash Pothula"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "openai==1.54.4",
+    "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.3",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
