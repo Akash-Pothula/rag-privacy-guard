@@ -45,25 +45,47 @@ def extract_json(text: str, fallback: Optional[Dict[str, Any]] = None) -> Dict[s
             continue
     
     # Try to find JSON object in text (look for { ... })
-    brace_pattern = r'\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\})*)*\})*)*\}'
-    matches = re.findall(brace_pattern, text, re.DOTALL)
-    
-    # Try matches from longest to shortest
-    for match in sorted(matches, key=len, reverse=True):
-        try:
-            return json.loads(match)
-        except json.JSONDecodeError:
-            continue
+    # Use simpler pattern to avoid ReDoS - just match balanced braces
+    try:
+        # Find all potential JSON objects by looking for opening braces
+        start_positions = [i for i, c in enumerate(text) if c == '{']
+        for start in start_positions:
+            # Find matching closing brace by counting depth
+            depth = 0
+            for i in range(start, len(text)):
+                if text[i] == '{':
+                    depth += 1
+                elif text[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        candidate = text[start:i+1]
+                        try:
+                            return json.loads(candidate)
+                        except json.JSONDecodeError:
+                            break
+    except Exception:
+        pass
     
     # Try to find JSON array in text (look for [ ... ])
-    bracket_pattern = r'\[(?:[^\[\]]|(?:\[(?:[^\[\]]|(?:\[[^\[\]]*\])*)*\])*)*\]'
-    matches = re.findall(bracket_pattern, text, re.DOTALL)
-    
-    for match in sorted(matches, key=len, reverse=True):
-        try:
-            return json.loads(match)
-        except json.JSONDecodeError:
-            continue
+    try:
+        # Find all potential JSON arrays by looking for opening brackets
+        start_positions = [i for i, c in enumerate(text) if c == '[']
+        for start in start_positions:
+            # Find matching closing bracket by counting depth
+            depth = 0
+            for i in range(start, len(text)):
+                if text[i] == '[':
+                    depth += 1
+                elif text[i] == ']':
+                    depth -= 1
+                    if depth == 0:
+                        candidate = text[start:i+1]
+                        try:
+                            return json.loads(candidate)
+                        except json.JSONDecodeError:
+                            break
+    except Exception:
+        pass
     
     # All parsing attempts failed
     return fallback

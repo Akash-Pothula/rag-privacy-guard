@@ -83,7 +83,8 @@ def print_evaluation_result(result: EvaluationResult, show_details: bool = True)
         print(f"\n{Colors.BOLD}{pr.principle}:{Colors.RESET}")
         print(f"  Status: {status_color}{status}{Colors.RESET}")
         print(f"  Severity: {severity_color}{pr.severity}{Colors.RESET}")
-        print(f"  Reasoning: {pr.reasoning[:200]}...")
+        reasoning = pr.reasoning[:200] + "..." if len(pr.reasoning) > 200 else pr.reasoning
+        print(f"  Reasoning: {reasoning}")
     
     # PII Detection
     if result.pii_items:
@@ -104,7 +105,8 @@ def print_evaluation_result(result: EvaluationResult, show_details: bool = True)
             severity_color = get_severity_color(jr.severity)
             print(f"Type: {jr.jailbreak_type}")
             print(f"Severity: {severity_color}{jr.severity}{Colors.RESET}")
-            print(f"Reasoning: {jr.reasoning[:200]}...")
+            reasoning = jr.reasoning[:200] + "..." if len(jr.reasoning) > 200 else jr.reasoning
+            print(f"Reasoning: {reasoning}")
     
     # Reconciliation Notes
     if result.reconciliation_notes:
